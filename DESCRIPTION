@@ -1,0 +1,14 @@
+Package: goreparent
+Type: Package
+Title: Clustering Of GO Terms Into Related Parent Groups
+Version: 0.1.0
+Author: Brandon Signal
+Maintainer: Brandon Signal <brandon.signal@gmail.comt>
+Description: Clustering of GO terms into groups of highly related terms.
+    Looks for common parents, siblings, cousin terms. Names clusters
+    based on parent GO terms, giving short, descriptive names for clusters. 
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+Imports: GO.db, AnnotationDbi, dplyr, GOfuncR, plyr, clusterProfiler, data.table, ggplot2, stringr, simplifyEnrichment, forcats, reshape2
+RoxygenNote: 7.2.1

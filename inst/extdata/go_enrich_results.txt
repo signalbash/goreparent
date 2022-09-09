@@ -1,0 +1,76 @@
+ID	Description	FDR
+GO:0050804	modulation of synaptic transmission	3.597675367687544e-8
+GO:0007409	axonogenesis	3.597675367687544e-8
+GO:0050808	synapse organization	3.597675367687544e-8
+GO:0061564	axon development	1.381311292298011e-7
+GO:0050890	cognition	3.147270076547318e-7
+GO:0048167	regulation of synaptic plasticity	3.147270076547318e-7
+GO:0007416	synapse assembly	3.147270076547318e-7
+GO:0048813	dendrite morphogenesis	3.147270076547318e-7
+GO:0051960	regulation of nervous system development	3.333700978838133e-7
+GO:0007611	learning or memory	8.031164725413214e-7
+GO:0045664	regulation of neuron differentiation	2.4739574721614003e-6
+GO:0050770	regulation of axonogenesis	4.282869562021032e-6
+GO:0050767	regulation of neurogenesis	5.249737106089051e-6
+GO:0016358	dendrite development	5.249737106089051e-6
+GO:0010975	regulation of neuron projection development	5.249737106089051e-6
+GO:0070997	neuron death	1.211205334103301e-5
+GO:0097061	dendritic spine organization	2.108306515651404e-5
+GO:0051963	regulation of synapse assembly	5.310927829234575e-5
+GO:0051402	neuron apoptotic process	5.539041137329945e-5
+GO:0051965	positive regulation of synapse assembly	5.7591637211194805e-5
+GO:0006325	chromatin organization	6.0089629959194815e-5
+GO:0050773	regulation of dendrite development	8.870777150093356e-5
+GO:0050807	regulation of synapse organization	1.0004328233583195e-4
+GO:0048814	regulation of dendrite morphogenesis	1.1720682028636088e-4
+GO:0048588	developmental cell growth	1.1720682028636088e-4
+GO:1901214	regulation of neuron death	1.2183337172075637e-4
+GO:0051962	positive regulation of nervous system development	1.760547520398986e-4
+GO:0031333	negative regulation of protein complex assembly	1.760547520398986e-4
+GO:0060997	dendritic spine morphogenesis	2.3536098891790795e-4
+GO:0060996	dendritic spine development	2.651063306859597e-4
+GO:0090083	regulation of inclusion body assembly	2.679136538151553e-4
+GO:0061001	regulation of dendritic spine morphogenesis	3.161430632329052e-4
+GO:0050772	positive regulation of axonogenesis	3.31428342414575e-4
+GO:0043523	regulation of neuron apoptotic process	4.429002512602274e-4
+GO:0060998	regulation of dendritic spine development	6.067105351784684e-4
+GO:0007215	glutamate receptor signaling pathway	8.245268794923708e-4
+GO:0060291	long-term synaptic potentiation	8.919922407831046e-4
+GO:0045666	positive regulation of neuron differentiation	9.078386838156206e-4
+GO:0031111	negative regulation of microtubule polymerization or depolymerization	9.199898995945743e-4
+GO:0007612	learning	0.0010232621458261396
+GO:0007613	memory	0.0010647980958252744
+GO:1901215	negative regulation of neuron death	0.0011486130269960787
+GO:0097193	intrinsic apoptotic signaling pathway	0.001258093249386426
+GO:0007626	locomotory behavior	0.0013921466234829796
+GO:0010976	positive regulation of neuron projection development	0.001781212918026077
+GO:0061387	regulation of extent of cell growth	0.002525612448286188
+GO:0031346	positive regulation of cell projection organization	0.0025992774177867476
+GO:0050769	positive regulation of neurogenesis	0.0026688308334810572
+GO:0043524	negative regulation of neuron apoptotic process	0.0029872239996296276
+GO:1902904	negative regulation of supramolecular fiber organization	0.0030191929270268333
+GO:1990138	neuron projection extension	0.0030191929270268333
+GO:0001764	neuron migration	0.0032576127715076625
+GO:0016055	Wnt signaling pathway	0.003569406065160584
+GO:0198738	cell-cell signaling by wnt	0.004037154069293981
+GO:0060070	canonical Wnt signaling pathway	0.004311487163888837
+GO:0010720	positive regulation of cell development	0.0043219367723434194
+GO:0099565	chemical synaptic transmission, postsynaptic	0.00469719085167251
+GO:0008306	associative learning	0.005051104980150064
+GO:0048675	axon extension	0.005051104980150064
+GO:0048013	ephrin receptor signaling pathway	0.005066825249326932
+GO:0043254	regulation of protein complex assembly	0.005193259685935058
+GO:0001558	regulation of cell growth	0.005606915031855797
+GO:0097485	neuron projection guidance	0.006022548114263237
+GO:0031110	regulation of microtubule polymerization or depolymerization	0.006358406683376386
+GO:0032272	negative regulation of protein polymerization	0.006630865383062895
+GO:0007272	ensheathment of neurons	0.007012943690177842
+GO:0008366	axon ensheathment	0.007012943690177842
+GO:0007411	axon guidance	0.007012943690177842
+GO:0090140	regulation of mitochondrial fission	0.0075202026056498976
+GO:0022037	metencephalon development	0.007558090192180632
+GO:0042552	myelination	0.0077843234080540525
+GO:0032535	regulation of cellular component size	0.0077843234080540525
+GO:0019932	second-messenger-mediated signaling	0.007968790071756203
+GO:0035637	multicellular organismal signaling	0.008942882836021137
+GO:0070507	regulation of microtubule cytoskeleton organization	0.009696947187891564
