@@ -4,7 +4,12 @@
 \alias{get_top_level_goterms}
 \title{Makes a vector containing "top level" GO terms,}
 \usage{
-get_top_level_goterms(max_parents = 2, max_from_top = 2, ignore_terms = NULL)
+get_top_level_goterms(
+  max_parents = 2,
+  max_from_top = 3,
+  ignore_terms = NULL,
+  max_children = NULL
+)
 }
 \description{
 Used to exclude when generating parent terms as ALL terms will be under the umbrella of

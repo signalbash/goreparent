@@ -3,10 +3,12 @@
 #' @param max_parents how many levels up from a GO term should be used to find common parents?
 #' default = \code{2}
 #' @param max_from_top how many levels down from top level GO terms should GO terms be excluded when searching for parent terms?
-#' default = \code{2}
+#' default = \code{3}
 #' Using this option prevents grouping of GO terms into top levels terms e.g. level 1: "biological_process" level 2: "biological regulation", "behavior"
 #' @param ignore_terms vector of any GO ids to ignore when searching for common parents.
 #' Can be helpful if you need to force one group into two or more smaller, more specific groups.
+#' default = \code{NULL}
+#' @param max_children ignore all GO parent terms with at least this many 'children' terms.
 #' default = \code{NULL}
 #' @export
 #' @examples
@@ -16,7 +18,7 @@
 #' add_go_parents(data.frame(GOIDS = c("GO:0070997","GO:1901214","GO:0051402",
 #' "GO:0043523","GO:1901215")))
 
-add_go_parents = function(go_results, max_parents = 2, max_from_top = 2, ignore_terms=NULL){
+add_go_parents = function(go_results, max_parents = 2, max_from_top = 3, ignore_terms=NULL, max_children=NULL){
 
   if(class(go_results)== "character"){
     go_results = data.frame(ID=go_results)
@@ -28,7 +30,8 @@ add_go_parents = function(go_results, max_parents = 2, max_from_top = 2, ignore_
     parents = lowest_common_parent(go_term_list = go_results[,id_col],
                                          max_parents=max_parents,
                                          max_from_top=max_from_top,
-                                         ignore_terms = ignore_terms)
+                                         ignore_terms = ignore_terms,
+                                         max_children = max_children)
     parents = get_meta_parents(go_parents = parents)
     m = match(go_results[,id_col], parents$id)
     go_results$parent_id = parents$parent_id[m]
@@ -46,9 +49,9 @@ add_go_parents = function(go_results, max_parents = 2, max_from_top = 2, ignore_
 #' @import dplyr
 #' @importFrom reshape2 melt
 #' @keywords internal
-lowest_common_parent = function(go_term_list, max_parents = 2, max_from_top = 2, fill_terms = T, ignore_terms = NULL){
+lowest_common_parent = function(go_term_list, max_parents = 2, max_from_top = 3, fill_terms = T, ignore_terms = NULL, max_children=NULL){
 
-  top_level_terms = get_top_level_goterms(max_parents, max_from_top, ignore_terms)
+  top_level_terms = get_top_level_goterms(max_parents, max_from_top, ignore_terms, max_children)
 
   go.2 = go_term_list
 

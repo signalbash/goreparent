@@ -10,9 +10,9 @@ plot_go_parents(
   collapse = TRUE,
   n_top = 10,
   sort_top_by = c("FDR", "p.adjust", "pval", "p", "p.val"),
-  color = "FDR",
+  color = "-log10(FDR)",
   size = NULL,
-  x.axis = c("GeneRatio", "Odds.Ratio")
+  x.axis = c("GeneRatio", "Odds.Ratio", "-log10(FDR)")
 )
 }
 \arguments{

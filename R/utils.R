@@ -99,7 +99,7 @@ check_goid_col = function(go_results, verbose = TRUE){
 #' @import GOfuncR
 #' @import dplyr
 
-get_top_level_goterms = function(max_parents = 2, max_from_top = 2, ignore_terms = NULL){
+get_top_level_goterms = function(max_parents = 2, max_from_top = 3, ignore_terms = NULL, max_children=NULL){
 
   ### INTERNAL EXAMPLES
   # get_top_level_goterms()
@@ -111,10 +111,25 @@ get_top_level_goterms = function(max_parents = 2, max_from_top = 2, ignore_terms
   # # all terms above CIA complex are added to the top_level_terms
   # all(CIA_parents$parent_go_id %in% top_terms)
 
+
+  children = GOfuncR::get_child_nodes(c("GO:0008150", "GO:0003674", "GO:0005575"))
+
   top_level_terms =
-    GOfuncR::get_child_nodes(c("GO:0008150", "GO:0003674", "GO:0005575")) %>%
+    children %>%
     filter(.data$distance < max_from_top) %>% dplyr::select(.data$child_go_id)
   top_level_terms = top_level_terms$child_go_id
+
+  if(!is.null(max_children)){
+    big_parents =
+      GOfuncR::get_child_nodes(children$child_go_id) %>%
+      filter(distance>0) %>%
+      count(parent_go_id) %>%
+      filter(n>=max_children) %>%
+      left_join(children, by=c('parent_go_id' = 'child_go_id')) %>% select(c("parent_go_id", "n", "child_name", "distance"))
+    top_level_terms = unique(c(top_level_terms, big_parents$parent_go_id))
+  }
+
+
   if(!is.null(ignore_terms)){
     parents = GOfuncR::get_parent_nodes(ignore_terms)
     top_level_terms = unique(c(top_level_terms, parents$parent_go_id))
@@ -190,4 +205,30 @@ calc_go_ratios = function(go_results){
   return(go_results)
 }
 
+test_var_in_data <- function(data, variable, check_null_etc=TRUE) {
+
+
+  if(is.null(variable) & check_null_etc){
+    return(list(TRUE, variable, variable))
+  }else if(is.numeric(variable) & check_null_etc){
+    return(list(TRUE, variable, variable))
+  }else{
+    variable_is_parseable = FALSE
+    counter=1
+    while(variable_is_parseable==FALSE & counter <= length(variable)){
+      workingvar = variable[counter]
+      variable_is_parseable = tryCatch({
+        data %>% mutate(NEW = eval(rlang::parse_expr(workingvar))) %>% head
+        TRUE
+      }, error = function(e)
+        FALSE
+      )
+      counter=counter+1
+
+    }
+    basevar = unlist(lapply(colnames(data), function(x) x[grep(x, workingvar)]))[1]
+
+    return(list(variable_is_parseable, workingvar, basevar))
+  }
+}
 

@@ -8,9 +8,10 @@ Runs for all potential combinations of GO terms given as input in \code{go_term_
 lowest_common_parent(
   go_term_list,
   max_parents = 2,
-  max_from_top = 2,
+  max_from_top = 3,
   fill_terms = T,
-  ignore_terms = NULL
+  ignore_terms = NULL,
+  max_children = NULL
 )
 }
 \arguments{

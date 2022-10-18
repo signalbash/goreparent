@@ -35,7 +35,8 @@
 #'
 plot_go_parents = function(go_results, type="dot", collapse=TRUE, n_top=10,
                            sort_top_by = c("FDR", "p.adjust", "pval", "p", "p.val"),
-                           color="FDR", size = NULL, x.axis = c("GeneRatio", "Odds.Ratio")){
+                           color="-log10(FDR)", size = NULL,
+                           x.axis = c("GeneRatio", "Odds.Ratio", "-log10(FDR)")){
 
   compare = FALSE
   # options not yet added for plottypes other than "dot"
@@ -63,20 +64,30 @@ plot_go_parents = function(go_results, type="dot", collapse=TRUE, n_top=10,
     stop("Can't find any of the sorting variables (sort_top_by = c(", paste(sort_top_by, collapse = ", "), ")) in go_results")
   }
 
-  ## check x-axis, size, colour are variables
-  if(!any(colnames(go_results) %in% c(color))){
+ ## check x-axis, size, colour are variables
+  color_check = test_var_in_data(go_results, color)
+  if(!color_check[[1]]){
     message(color, " is not found in the data.frame supplied, defaulting to ", FDR_or_p)
     color = FDR_or_p
+    color_check[[3]] = color
+  }else{
+    color = color_check[[2]]
   }
-  if(!any(colnames(go_results) %in% c(size)) & !is.null(size)){
+  size_check = test_var_in_data(go_results, size)
+  if(!size_check[[1]]){
     message(size, " is not found in the data.frame supplied, set size to NULL if you don't want to plot size")
     size = FDR_or_p
+    size_check[[3]] = size
+  }else{
+    size=size_check[[2]]
   }
-  if(!any(colnames(go_results) %in% x.axis)){
+  x.axis_check = test_var_in_data(go_results, x.axis)
+  if(!x.axis_check[[1]]){
     message(paste(x.axis, collapse = " or "), " is not found in the data.frame supplied, defaulting to ", FDR_or_p)
     x.axis = FDR_or_p
+    x.axis_check[[3]] = x.axis
   }else{
-    x.axis = x.axis[x.axis %in% colnames(go_results)][1]
+    x.axis = x.axis_check[[2]]
   }
 
   if(compare){
@@ -93,7 +104,7 @@ plot_go_parents = function(go_results, type="dot", collapse=TRUE, n_top=10,
 
       p = go_results_summary %>% filter(.data$parent_description %in% top) %>%
         mutate(parent_description = factor(.data$parent_description, levels = rev(top))) %>%
-        ggplot(aes_string(x="set", y="parent_description", size="GO_subcat_count", col=sprintf("-log10(%s)", color))) +
+        ggplot(aes_string(x="set", y="parent_description", size="GO_subcat_count", col=color)) +
         geom_point()+
         theme_minimal() + theme(panel.border = element_rect(fill=NA, size=0.1)) +
         scale_color_gradient(low="red", high="blue") +
@@ -104,7 +115,7 @@ plot_go_parents = function(go_results, type="dot", collapse=TRUE, n_top=10,
       p = go_results %>%
         filter(.data$parent_description %in% top) %>%
         mutate(Description = as_factor(.data$Description)) %>%
-        ggplot(aes_string(x="set", y = "Description",  col=sprintf("-log10(%s)", color), size=size)) +
+        ggplot(aes_string(x="set", y = "Description",  col=color, size=size)) +
         geom_point()+ scale_color_gradient(low="red", high="blue") +
         facet_grid(rows = vars(.data$parent_description), scales="free_y", space="free_y", switch="y")+
         theme_minimal()+ theme(panel.border = element_rect(fill=NA, size=0.1)) +
@@ -124,24 +135,20 @@ plot_go_parents = function(go_results, type="dot", collapse=TRUE, n_top=10,
       dplyr::select(.data$parent_description)
 
     if(collapse == TRUE & type == "dot"){
-      p = go_results %>%
+      p =
+        go_results %>%
         filter(.data$parent_description %in% top$parent_description) %>%
-        dplyr::rename(TEST = matches(x.axis)) %>%
-        mutate(parent_description = fct_reorder(.data$parent_description, .data$TEST, .fun=max)) %>%
-        dplyr::rename_with(function(x) x.axis,  matches("TEST")) %>%
+        mutate(parent_description = factor(.data$parent_description, levels=rev(top$parent_description))) %>%
         mutate(Description = as_factor(.data$Description)) %>%
-        ggplot(aes_string(x=x.axis, y = "parent_description", col=sprintf("-log10(%s)", color), size=size)) +
+        ggplot(aes_string(x=x.axis, y = "parent_description", col=color, size=size)) +
         geom_point() + scale_color_gradient(low="red", high="blue") +
         theme_minimal() + theme(panel.border = element_rect(fill=NA, size=0.1)) + scale_y_discrete("GO parent term")
     }else if(collapse == FALSE & type == "dot"){
       p = go_results %>%
         filter(.data$parent_description %in% top$parent_description) %>%
-        dplyr::rename(TEST = matches(x.axis)) %>%
-        mutate(parent_description = fct_reorder(.data$parent_description, .data$TEST, .fun=max)) %>%
-        dplyr::rename_with(function(x) x.axis,  matches("TEST")) %>%
+        mutate(parent_description = factor(.data$parent_description, levels=rev(top$parent_description))) %>%
         mutate(Description = as_factor(.data$Description)) %>%
-
-        ggplot(aes_string(x=x.axis, y = "Description",  col=sprintf("-log10(%s)", color), size=size)) +
+        ggplot(aes_string(x=x.axis, y = "Description",  col=color, size=size)) +
         geom_point()+ scale_color_gradient(low="red", high="blue") +
         facet_grid(rows = vars(.data$parent_description), scales="free_y", space="free_y", switch="y")+
         theme_minimal()+ theme(panel.border = element_rect(fill=NA, size=0.1)) +

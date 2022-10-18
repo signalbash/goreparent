@@ -18,11 +18,14 @@
 #' default = \code{2}
 #' @param max_from_top if using method = \code{"parent"}:
 #' how many levels down from top level GO terms should GO terms be excluded when searching for parent terms?
-#' default = \code{2}
+#' default = \code{3}
 #' Using this option prevents grouping of GO terms into top levels terms e.g. level 1: "biological_process" level 2: "biological regulation", "behavior"
 #' @param ignore_terms if using method = \code{"parent"}:
 #' vector of any GO ids to ignore when searching for common parents.
 #' Can be helpful if you need to force one group into two or more smaller, more specific groups.
+#' default = \code{NULL}
+#' @param max_children if using method = \code{"parent"}:
+#' ignore all GO parent terms with at least this many 'children' terms.
 #' default = \code{NULL}
 #' @param method which method to use for grouping.
 #' \code{"parent"}: common parents of GO terms, going up two levels and ignoring any top level terms/terms on the ignore list.
@@ -48,7 +51,7 @@
 #'
 add_go_groups = function(go_input, FDR=0.05, n_top=10,
                          descriptive_parent = TRUE,
-                         max_parents = 2, max_from_top = 2, ignore_terms=NULL,
+                         max_parents = 2, max_from_top = 3, ignore_terms=NULL, max_children=NULL,
                          method = c("parent", "cluster"),
                          verbose=TRUE,
                          ...
@@ -107,7 +110,8 @@ add_go_groups = function(go_input, FDR=0.05, n_top=10,
     go_results = add_go_parents(all_go_terms,
                                 max_parents=max_parents,
                                 max_from_top=max_from_top,
-                                ignore_terms=ignore_terms)
+                                ignore_terms=ignore_terms,
+                                max_children=max_children)
 
     enrich_results_list = lapply(go_input, function(x){
       left_join(x, go_results, by = stats::setNames("ID", datatypes[2]))
@@ -148,7 +152,7 @@ add_go_groups = function(go_input, FDR=0.05, n_top=10,
     pretest = ifelse(method[1]=="parent", T, F)
     go_results = make_descriptive_parent(go_results, group_col = "parent_description" ,
                                         pretest = pretest, verbose=verbose, n_top = n_top,
-                                        max_parents = max_parents, max_from_top = max_from_top, ignore_terms = ignore_terms)
+                                        max_parents = max_parents, max_from_top = max_from_top, ignore_terms = ignore_terms, max_children=max_children)
 
     enrich_results_list = lapply(enrich_results_list, function(x){
       x$parent_description = go_results$parent_description[match(x[,datatypes[2]], go_results[,datatypes[2]])]

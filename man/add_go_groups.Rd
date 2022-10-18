@@ -10,8 +10,9 @@ add_go_groups(
   n_top = 10,
   descriptive_parent = TRUE,
   max_parents = 2,
-  max_from_top = 2,
+  max_from_top = 3,
   ignore_terms = NULL,
+  max_children = NULL,
   method = c("parent", "cluster"),
   verbose = TRUE,
   ...
@@ -34,12 +35,16 @@ default = \code{2}}
 
 \item{max_from_top}{if using method = \code{"parent"}:
 how many levels down from top level GO terms should GO terms be excluded when searching for parent terms?
-default = \code{2}
+default = \code{3}
 Using this option prevents grouping of GO terms into top levels terms e.g. level 1: "biological_process" level 2: "biological regulation", "behavior"}
 
 \item{ignore_terms}{if using method = \code{"parent"}:
 vector of any GO ids to ignore when searching for common parents.
 Can be helpful if you need to force one group into two or more smaller, more specific groups.
+default = \code{NULL}}
+
+\item{max_children}{if using method = \code{"parent"}:
+ignore all GO parent terms with at least this many 'children' terms.
 default = \code{NULL}}
 
 \item{method}{which method to use for grouping.
