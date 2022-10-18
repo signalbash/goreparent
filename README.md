@@ -33,8 +33,8 @@ go_parents = add_go_groups(go_input)
 ```
 plot_go_parents(go_parents)
 ```
-[PNG LINK]
+![](https://github.com/signalbash/goreparent/blob/main/vignettes/go_parents_collapse.png)
 ```
 plot_go_parents(go_parents, collapse=FALSE, n_top=2)
 ```
-[PNG LINK]
+![](https://github.com/signalbash/goreparent/blob/main/vignettes/go_parents_full_ntop2.png)
