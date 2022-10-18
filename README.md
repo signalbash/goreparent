@@ -16,7 +16,7 @@ BiocManager::install(c("AnnotationDbi", "clusterProfiler", "GO.db", "GOfuncR", "
 ```
 
 ## Usage
-Please see the vignette for full usage details. 
+Please see the [vignette](https://signalbash.github.io/goreparent/vignettes/vignette.html) for full usage details. 
 
 ## Basic usage
 goreparent clusters GO terms into groups of directly related terms with a common parent. The extent of the search for common parents between GO terms can be customised by the variables max_parents (default=2) - which defines how many generations up the search will be performed from initial 'child' GO terms - and max_from_top (default=3) - which defines how many levels down from the top level GO terms ("biological_process", "molecular_function", "cellular_component") is considered *outside* of the search frame and should enable more specific clusters to be identified.
