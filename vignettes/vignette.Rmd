@@ -1,0 +1,142 @@
+---
+title: "goreparent vignette"
+author: "Brandon Signal"
+date: '2022-09-12'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+```
+
+## Basic Usage
+goreparent clusters GO terms into groups of directly related terms with a common parent. The extent of the search for common parents between GO terms can be customised by the variables max_parents (default=2) - which defines how many generations up the search will be performed from initial 'child' GO terms - and max_from_top (default=3) - which defines how many levels down from the top level GO terms ("biological_process", "molecular_function", "cellular_component") is considered outside of the search frame and should enable more specific clusters to be identified.
+
+
+```{r setup library}
+library(goreparent)
+
+enrich_file = system.file("extdata","go_enrich_results.txt", package = "goreparent")
+go_input = read.table(enrich_file, sep="\t", header=TRUE)
+```
+
+### Group GO terms by common parents
+```{r parents_nondescript}
+go_parents = add_go_groups(go_input, descriptive_parent=FALSE)
+# plot with terms collapsed into groups
+plot_go_parents(go_parents)
+# plot with expanded GO terms for the top 2 groups 
+plot_go_parents(go_parents, collapse=FALSE, n_top=2)
+```
+
+## Advanced Usage
+
+### More refined and descriptive GO groups
+Sometimes, if `max_from_top` is set too low, or too many terms are grouping under a few too broadly descriptive parents, you may want to further refine or describe these groups. This can be achieved one of three ways: altering `max_from_top`, adding terms to `ignore_terms`, or adding group descriptions with `descriptive_parent=TRUE`.
+
+```{r, low_max_from_top}
+go_parents_l2 = add_go_groups(go_input, max_from_top = 2, descriptive_parent=FALSE)
+table(go_parents_l2$parent_description) %>% 
+  as.data.frame() %>% 
+  rename(parent_description=Var1) %>% 
+  arrange(desc(Freq)) %>% 
+  knitr::kable()
+```
+
+As we see from before, using `max_from_top=3` [default], we found terms associated with neural processes, whereas here using `max_from_top=2` we get broader categories such as `"cell differentiation"` and `"cell-cell signaling"`. If we look at the GO terms contained within these clusters, we find that they are clearly related to neural processes.
+```{r, low_max_from_top_table2}
+go_parents_l2 %>% 
+  filter(parent_description %in% c("cell differentiation", "cell-cell signaling")) %>% 
+  select(parent_description, Description) %>% arrange(parent_description) %>% 
+  knitr::kable()
+
+```
+
+#### 1. Change `max_from_top` to a higher value
+```{r}
+go_parents_l2 %>%
+  select(ID, Description, FDR) %>%
+  add_go_groups(max_from_top = 3, descriptive_parent = FALSE) %>%
+  left_join(go_parents_l2[,c("Description", "parent_description")], by = "Description", suffix=c(".level3", ".level2")) %>%
+  arrange(parent_description.level2, parent_description.level3)  %>%  select("Description", starts_with("parent_description")) %>% 
+  filter(parent_description.level2 %in% c("cell differentiation","cell-cell signaling")) %>% 
+  knitr::kable()
+```
+
+#### 2. Remove parent GO term manually
+This can be helpful if all other groups are descriptive of their children terms, but a few are not. cell-cell signalling is too broad, but neuron death is not. This requires specifying `add_go_groups(ignore_terms = "GO:0007267")`
+
+```{r}
+# GO description for cell-cell signaling
+id2term("GO:0007267")
+
+go_parents_l2 %>%
+  filter(parent_description %in% c("cell-cell signaling", "neuron death")) %>%
+  select(ID, Description, FDR) %>%
+  add_go_groups(descriptive_parent = FALSE, ignore_terms = "GO:0007267") %>%
+  left_join(go_parents_l2[,c("Description", "parent_description")], by = "Description", suffix=c(".ignore_term", ".level2")) %>%
+  arrange(parent_description.level2, parent_description.ignore_term)  %>%  select("Description", starts_with("parent_description")) %>% 
+  knitr::kable()
+
+```
+
+#### 3. Remove GO terms with too many children
+This is a generalised way to remove parent terms that may encompass too many child terms to be descriptive by themselves. 
+
+```{r}
+
+go_parents_l2 %>%
+  select(ID, Description, FDR) %>%
+  add_go_groups(max_from_top = 2, descriptive_parent = FALSE, max_children = 100) %>%
+  left_join(go_parents_l2[,c("Description", "parent_description")], by = "Description", suffix=c(".max_child", ".level2")) %>%
+  arrange(parent_description.level2, parent_description.max_child)  %>%  select("Description", starts_with("parent_description")) %>% 
+  filter(parent_description.level2 %in% c("cell differentiation","cell-cell signaling")) %>% 
+  knitr::kable()
+
+```
+
+
+#### 4. Adding additional "descriptive" parents 
+This option works on clusters of GO terms that may not be closely related, and thus works on GO clustering output from other clustering algorithms. It is, however, currently very slow, and therefore we only recommend running it on the top clusters of significance by setting `n_top` to an integer.
+
+The descriptive parent option uses `make_descriptive_parent()` - a function which relies on finding GO terms which are semi-related to all GO terms in a cluster. This function works to find parent terms which are step-parents/uncles to children terms. This allows 1 degree of separation in defining parent terms, which once terms are ranked, chooses the parent term with the highest relatedness. If all child GO terms are unable to be related to the one parent even with this relaxation in relationships, further terms are tried until all child terms are covered by one parent.
+
+Using normal goreparent parental clustering + `descriptive_parent=TRUE`
+
+```{r}
+go_parents_l2.descriptive = add_go_groups(go_input, descriptive_parent=TRUE, max_from_top=2, verbose=FALSE, n_top = 10)
+plot_go_parents(go_parents_l2.descriptive)
+```
+
+using `make_descriptive_parent()` separately post-`add_go_group`
+This creates a table with new_parent_description in a separate column which can be used to add to/replace the original 'parent term' in a format of your choosing. 
+```{r}
+go_parents_l2.add_desc = go_parents_l2 %>%
+  filter(parent_description %in% c("cellular component organization")) %>%
+  select(ID, Description, parent_description, FDR) %>%
+  make_descriptive_parent(replace_group_col = FALSE) 
+
+go_parents_l2.add_desc %>% head(2) %>% select(-FDR) %>% knitr::kable()
+
+library(ggplot2)
+go_parents_l2.add_desc %>% 
+  ggplot( aes(x=-log10(FDR), y=Description, col=-log10(FDR))) + 
+  geom_point() + 
+  facet_wrap(~parent_description+new_parent_description) +
+  theme_minimal()+ 
+  theme(panel.border = element_rect(fill=NA, size=0.1)) +
+  theme(strip.text.x = element_text(face="bold", hjust=0))
+    
+```
+
+### Usage with simplifyEnrichment
+
+We are aware of simplifyEnrichment and how it can cluster GO terms, however we found that the clusters - while semantically related - did not have an easily string-convertible description of what terms the cluster actually contains, and therefore still requires displaying all the child terms and naming in a non-informative manner.
+
+There is a built-in option to use simplifyEnrichment semantic similarity clustering within `add_go_groups()`, using the option `method="cluster"`. For this method we HIGHLY recommend running with `descriptive_parent=TRUE`.
+
+```{r, message=FALSE}
+go_clusters = add_go_groups(go_input, method = "cluster", descriptive_parent=TRUE)
+plot_go_parents(go_clusters)
+```
